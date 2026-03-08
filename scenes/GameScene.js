@@ -5,7 +5,7 @@ export class GameScene extends Phaser.Scene {
 
   init(data) {
     this.levelIndex = data.levelIndex || 0;
-    this.level = LEVELS[this.levelIndex];
+    this.level = LEVELS[this.levelIndex] || LEVELS[0];
     this.hearts = 3;
     this.canDoubleJump = false;
     this.hasDoubleJumped = false;
@@ -18,6 +18,7 @@ export class GameScene extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
 
+    // level.background is always a CSS hex string (e.g. '#87CEEB') per levelConfig.js
     // Background
     this.add.rectangle(width / 2, height / 2, width, height,
       Phaser.Display.Color.HexStringToColor(this.level.background).color);
@@ -134,11 +135,11 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  update(time) {
+  update(time, delta) {
     if (this.gameOver) return;
 
     // Scroll ground visually
-    this.groundTiles.tilePositionX += this.level.scrollSpeed * 0.016;
+    this.groundTiles.tilePositionX += this.level.scrollSpeed * (delta / 1000);
 
     // Clean up off-screen obstacles
     this.obstacles = this.obstacles.filter(obs => {
