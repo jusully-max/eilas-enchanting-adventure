@@ -20,13 +20,16 @@ export class LevelSelectScene extends Phaser.Scene {
       const y = 160 + row * 140;
       const unlocked = i === 0 || progress[`level_${i}`] === 'complete';
 
-      // Door background
+      // Door background (only unlocked doors are interactive)
       const door = this.add.rectangle(x, y, 130, 110,
-        unlocked ? 0x8B4513 : 0x444444).setInteractive();
+        unlocked ? 0x8B4513 : 0x444444);
+      if (unlocked) { door.setInteractive(); }
 
-      // Door frame
-      this.add.rectangle(x, y, 130, 110, 0x000000, 0).setStrokeStyle(3,
-        unlocked ? 0xFFD700 : 0x666666);
+      // Door frame — Rectangle has no setStrokeStyle(); use Graphics instead
+      const borderColor = unlocked ? 0xFFD700 : 0x666666;
+      const border = this.add.graphics();
+      border.lineStyle(3, borderColor, 1);
+      border.strokeRect(x - 65, y - 55, 130, 110);
 
       // Level number
       this.add.text(x, y - 20, `${level.id}`, {
@@ -39,8 +42,11 @@ export class LevelSelectScene extends Phaser.Scene {
       }).setOrigin(0.5);
 
       // Stars
+      // Note: unlock key uses 0-based levelIndex (`level_${i}`), star key uses 1-based level id (`stars_${level.id}`).
+      // Different prefixes prevent collision; both match what GameScene writes.
       const stars = progress[`stars_${level.id}`] || 0;
-      this.add.text(x, y + 42, '⭐'.repeat(stars) + '☆'.repeat(3 - stars), {
+      const safeStars = Math.min(Math.max(stars, 0), 3);
+      this.add.text(x, y + 42, '⭐'.repeat(safeStars) + '☆'.repeat(3 - safeStars), {
         fontSize: '14px',
       }).setOrigin(0.5);
 
