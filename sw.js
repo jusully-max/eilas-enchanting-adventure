@@ -1,4 +1,4 @@
-const CACHE = 'eila-v5';
+const CACHE = 'eila-v6';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
