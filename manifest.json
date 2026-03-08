@@ -2,7 +2,7 @@
   "name": "Eila's Enchanting Adventure",
   "short_name": "Eila's Adventure",
   "description": "A magical princess adventure game made just for Eila!",
-  "start_url": "./",
+  "start_url": "/eilas-enchanting-adventure/",
   "display": "fullscreen",
   "orientation": "portrait",
   "background_color": "#1a0030",
