@@ -86,11 +86,11 @@ export class GameScene extends Phaser.Scene {
         this.add.rectangle(fx, GROUND_Y + 5, 3, 12, 0x2ECC40);
       }
     } else if (lvl === 1) {
-      // Enchanted Forest: trees
+      // Enchanted Forest: trees — use bright green so they contrast against the dark #2d5016 background
       for (let i = 0; i < 5; i++) {
         const tx = 30 + i * 80;
-        this.add.triangle(tx, GROUND_Y - 40, tx - 22, GROUND_Y, tx + 22, GROUND_Y, tx, GROUND_Y - 80, 0x1A5C1A);
-        this.add.rectangle(tx, GROUND_Y - 5, 10, 20, 0x5D3A1A);
+        this.add.triangle(tx, GROUND_Y - 40, tx - 22, GROUND_Y, tx + 22, GROUND_Y, tx, GROUND_Y - 80, 0x27AE60);
+        this.add.rectangle(tx, GROUND_Y - 5, 10, 20, 0x7D5A3A);
       }
     } else if (lvl === 2) {
       // Castle Courtyard: battlements
@@ -150,11 +150,16 @@ export class GameScene extends Phaser.Scene {
   spawnObstacle(time) {
     const { width } = this.scale;
     const key = this.level.obstacleTexture || 'obstFrog';
-    const obs = this.physics.add.image(width + 40, GROUND_Y - 20, key);
+    // Spawn with center-bottom origin so obstacle sits on ground level
+    const spawnY = GROUND_Y - 20;
+    const obs = this.physics.add.image(width + 40, spawnY, key);
     obs.setOrigin(0.5, 1);
+    // After setOrigin, re-sync the body position so it matches the new origin
+    obs.body.reset(width + 40 - obs.body.halfWidth, spawnY - obs.body.height);
     obs.body.setVelocityX(-this.level.scrollSpeed);
     obs.body.setAllowGravity(false);
     obs.body.setImmovable(true);
+    obs.setDepth(2);
     this.obstacleGroup.add(obs);
     this.obstacles.push(obs);
     this.nextObstacleTime = time + this.level.obstacleInterval;

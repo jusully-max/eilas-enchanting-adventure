@@ -119,16 +119,16 @@ export class BootScene extends Phaser.Scene {
     g.fillEllipse(36, 23, 8, 5);
     g.generateTexture('obstHedgehog', 44, 30);
 
-    // KNIGHT obstacle (38x54)
+    // KNIGHT obstacle (38x54) — dark navy armour so it stands out against #c0c0c0 silver background
     g.clear();
-    g.fillStyle(0x808080);
+    g.fillStyle(0x2C3E6B);
     g.fillRect(8, 18, 20, 28);            // body armour
     g.fillRect(4, 22, 8, 20);             // left arm
     g.fillRect(24, 22, 8, 20);            // right arm
     g.fillRect(10, 44, 6, 10);            // left leg
     g.fillRect(20, 44, 6, 10);            // right leg
     // Helmet
-    g.fillStyle(0x696969);
+    g.fillStyle(0x1A2A4A);
     g.fillRect(8, 6, 20, 16);
     g.fillStyle(0xFFD700);
     g.fillRect(10, 12, 16, 4);            // visor slot
