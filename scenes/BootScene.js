@@ -4,57 +4,80 @@ export class BootScene extends Phaser.Scene {
   create() {
     const g = this.make.graphics({ x: 0, y: 0, add: false });
 
-    // Eila — detailed princess character (60x85 texture)
+    // Eila — slim cute princess (60x85 texture)
     g.clear();
 
-    // Dress (purple trapezoid shape)
+    // Slim dress — narrow trapezoid skirt
     g.fillStyle(0x9B59B6);
-    g.fillTriangle(10, 35, 50, 35, 55, 80);
-    g.fillTriangle(10, 35, 5, 80, 55, 80);
-    g.fillRect(15, 25, 30, 15); // bodice
+    g.fillTriangle(22, 38, 38, 38, 46, 83);
+    g.fillTriangle(22, 38, 14, 83, 46, 83);
+    // Bodice (slim)
+    g.fillRect(23, 26, 14, 13);
+    // Dress trim / sparkle hem
+    g.fillStyle(0xD7B8F5);
+    g.fillRect(23, 37, 14, 2);
+    g.fillTriangle(14, 83, 22, 68, 30, 83);
+    g.fillTriangle(30, 83, 38, 68, 46, 83);
 
-    // Skin — arms
+    // Slim arms
     g.fillStyle(0xC8A97C);
-    g.fillRect(5, 28, 10, 18);   // left arm
-    g.fillRect(45, 28, 10, 18);  // right arm
+    g.fillRect(18, 28, 6, 15);  // left arm
+    g.fillRect(36, 28, 6, 15);  // right arm
 
     // Head
     g.fillStyle(0xC8A97C);
-    g.fillCircle(30, 18, 16);
+    g.fillCircle(30, 17, 13);
 
-    // Dark curly hair (multiple dark brown circles)
-    g.fillStyle(0x3B1F0A);
-    g.fillCircle(16, 12, 9);   // left side
-    g.fillCircle(30, 6, 9);    // top
-    g.fillCircle(44, 12, 9);   // right side
-    g.fillCircle(14, 22, 7);   // lower left curl
-    g.fillCircle(46, 22, 7);   // lower right curl
+    // Dark curly hair
+    g.fillStyle(0x2C1008);
+    g.fillCircle(18, 11, 8);   // left
+    g.fillCircle(30, 5,  8);   // top
+    g.fillCircle(42, 11, 8);   // right
+    g.fillCircle(16, 20, 6);   // lower left curl
+    g.fillCircle(44, 20, 6);   // lower right curl
 
-    // Face — re-draw skin over hair overlap on face center
+    // Re-draw face skin over hair
     g.fillStyle(0xC8A97C);
-    g.fillCircle(30, 18, 13);
+    g.fillCircle(30, 18, 11);
 
-    // Eyes
+    // Rosy cheeks
+    g.fillStyle(0xFFAAAA);
+    g.fillCircle(22, 22, 4);
+    g.fillCircle(38, 22, 4);
+
+    // Big cute eyes — white sclera
+    g.fillStyle(0xffffff);
+    g.fillCircle(25, 16, 4);
+    g.fillCircle(35, 16, 4);
+    // Dark iris
     g.fillStyle(0x2C1810);
-    g.fillCircle(25, 16, 2.5);
-    g.fillCircle(35, 16, 2.5);
+    g.fillCircle(25, 17, 3);
+    g.fillCircle(35, 17, 3);
+    // Eye shine highlight
+    g.fillStyle(0xffffff);
+    g.fillCircle(26, 15, 1);
+    g.fillCircle(36, 15, 1);
 
-    // Smile
-    g.fillStyle(0xE07050);
-    g.fillRect(26, 22, 8, 2);
+    // Cute smile — pink ellipse with skin mask on top = curved smile
+    g.fillStyle(0xFF6B8A);
+    g.fillEllipse(30, 25, 12, 7);  // pink mouth shape
+    g.fillStyle(0xC8A97C);
+    g.fillEllipse(30, 22, 14, 7);  // skin masks top → creates smile arc
+    // Small white teeth
+    g.fillStyle(0xffffff);
+    g.fillRect(27, 24, 6, 2);
 
     // Crown (gold)
     g.fillStyle(0xFFD700);
-    g.fillRect(18, 1, 24, 7);
-    // Crown points
-    g.fillTriangle(18, 8, 22, 1, 26, 8);
-    g.fillTriangle(26, 8, 30, 1, 34, 8);
-    g.fillTriangle(34, 8, 38, 1, 42, 8);
+    g.fillRect(20, 3, 20, 6);
+    g.fillTriangle(20, 9, 24, 3, 27, 9);
+    g.fillTriangle(27, 9, 30, 1, 33, 9);
+    g.fillTriangle(33, 9, 36, 3, 40, 9);
     // Crown gems
     g.fillStyle(0xFF1493);
-    g.fillCircle(22, 5, 2);
-    g.fillCircle(30, 3, 2);
-    g.fillCircle(38, 5, 2);
+    g.fillCircle(24, 6, 2);
+    g.fillCircle(30, 4, 2);
+    g.fillCircle(36, 6, 2);
 
     g.generateTexture('eilaSprite', 60, 85);
 
