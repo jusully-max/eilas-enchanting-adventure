@@ -64,12 +64,15 @@ export class VictoryScene extends Phaser.Scene {
 
     // Champion message
     this.time.delayedCall(2900, () => {
-      this.add.text(width / 2, 345, "You're the Champion of", {
+      const line1 = this.add.text(width / 2, 345, "You're the Champion of", {
         fontSize: '18px', fill: '#ffffff',
       }).setOrigin(0.5).setAlpha(0);
-      this.add.text(width / 2, 375, 'the Enchanted Kingdom!', {
+
+      const line2 = this.add.text(width / 2, 375, 'the Enchanted Kingdom!', {
         fontSize: '18px', fill: '#ffffff',
       }).setOrigin(0.5).setAlpha(0);
+
+      this.tweens.add({ targets: [line1, line2], alpha: 1, duration: 500 });
     });
 
     // Birthday message — big, festive, final reveal
