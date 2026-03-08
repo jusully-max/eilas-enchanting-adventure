@@ -13,6 +13,10 @@ export class GameScene extends Phaser.Scene {
     this.gameOver = false;
     this.obstacles = [];
     this.nextObstacleTime = 0;
+    this.finishLineDistance = 4000;
+    this.distanceTravelled = 0;
+    this.finishSpawned = false;
+    this.finishLine = null;
   }
 
   create() {
@@ -135,6 +139,24 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  triggerWin() {
+    this.gameOver = true;
+    const stars = this.hearts; // 1-3 stars based on hearts remaining
+    const progress = JSON.parse(localStorage.getItem('eila_progress') || '{}');
+    progress[`level_${this.levelIndex}`] = 'complete';
+    const existing = progress[`stars_${this.level.id}`] || 0;
+    progress[`stars_${this.level.id}`] = Math.max(existing, stars);
+    localStorage.setItem('eila_progress', JSON.stringify(progress));
+
+    this.time.delayedCall(300, () => {
+      this.scene.start('WinScene', {
+        levelIndex: this.levelIndex,
+        stars,
+        isLastLevel: this.levelIndex === 4,
+      });
+    });
+  }
+
   update(time, delta) {
     if (this.gameOver) return;
 
@@ -146,6 +168,25 @@ export class GameScene extends Phaser.Scene {
       if (obs.x < -50) { obs.destroy(); return false; }
       return true;
     });
+
+    // Track distance travelled
+    this.distanceTravelled += this.level.scrollSpeed * (delta / 1000);
+
+    // Spawn finish line trophy near end
+    if (!this.finishSpawned && this.distanceTravelled > this.finishLineDistance - 400) {
+      this.finishSpawned = true;
+      this.finishLine = this.add.text(
+        this.scale.width + 30, GROUND_Y - 80, '🏆', { fontSize: '64px' }
+      );
+      this.physics.add.existing(this.finishLine);
+      this.finishLine.body.setVelocityX(-this.level.scrollSpeed);
+      this.finishLine.body.setAllowGravity(false);
+    }
+
+    // Check if Eila reached the finish line
+    if (this.finishLine && this.finishLine.x < 120 && !this.gameOver) {
+      this.triggerWin();
+    }
 
     // Spawn obstacles
     if (time > this.nextObstacleTime) {
