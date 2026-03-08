@@ -17,6 +17,9 @@ export class GameScene extends Phaser.Scene {
     this.distanceTravelled = 0;
     this.finishSpawned = false;
     this.finishLine = null;
+    this.crowns = [];
+    this.nextCrownTime = 1500;
+    this.score = 0;
   }
 
   create() {
@@ -26,6 +29,9 @@ export class GameScene extends Phaser.Scene {
     // Background
     this.add.rectangle(width / 2, height / 2, width, height,
       Phaser.Display.Color.HexStringToColor(this.level.background).color);
+
+    // Background decorations (level-specific)
+    this.createBackgroundDecor();
 
     // Scrolling ground
     this.groundTiles = this.add.tileSprite(
@@ -55,6 +61,59 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(this.eila, this.obstacleGroup, this.hitObstacle, null, this);
   }
 
+  createBackgroundDecor() {
+    const { width, height } = this.scale;
+    const lvl = this.levelIndex;
+
+    // Clouds (all levels)
+    for (let i = 0; i < 4; i++) {
+      const cx = Phaser.Math.Between(40, width - 40);
+      const cy = Phaser.Math.Between(40, 180);
+      const cloud = this.add.ellipse(cx, cy, Phaser.Math.Between(70, 120), 35, 0xffffff, 0.7);
+      this.add.ellipse(cx - 22, cy + 8, 55, 28, 0xffffff, 0.6);
+      this.add.ellipse(cx + 22, cy + 8, 55, 28, 0xffffff, 0.6);
+      this.tweens.add({ targets: cloud, x: cx - width - 200, duration: Phaser.Math.Between(18000, 28000), repeat: -1, onRepeat: () => { cloud.x = width + 100; } });
+    }
+
+    // Level-specific decor
+    if (lvl === 0) {
+      // Royal Garden: flowers and sun
+      this.add.circle(340, 60, 28, 0xFFD700);  // sun
+      for (let i = 0; i < 8; i++) {
+        const fx = 20 + i * 50;
+        this.add.circle(fx, GROUND_Y - 5, 6, [0xFF69B4, 0xFF1493, 0xFF6347, 0xFFD700][i % 4]);
+        this.add.rectangle(fx, GROUND_Y + 5, 3, 12, 0x2ECC40);
+      }
+    } else if (lvl === 1) {
+      // Enchanted Forest: trees
+      for (let i = 0; i < 5; i++) {
+        const tx = 30 + i * 80;
+        this.add.triangle(tx, GROUND_Y - 40, tx - 22, GROUND_Y, tx + 22, GROUND_Y, tx, GROUND_Y - 80, 0x1A5C1A);
+        this.add.rectangle(tx, GROUND_Y - 5, 10, 20, 0x5D3A1A);
+      }
+    } else if (lvl === 2) {
+      // Castle Courtyard: battlements
+      for (let i = 0; i < 8; i++) {
+        this.add.rectangle(30 + i * 50, 30, 24, 40, 0x888888);
+      }
+      this.add.rectangle(width / 2, 55, width, 20, 0x999999);
+    } else if (lvl === 3) {
+      // Candy Kingdom: lollipops and candy cane stripes
+      for (let i = 0; i < 6; i++) {
+        const lx = 25 + i * 65;
+        this.add.circle(lx, GROUND_Y - 60, 18, [0xFF1493, 0xFF6347, 0x9B59B6][i % 3]);
+        this.add.rectangle(lx, GROUND_Y - 20, 5, 50, 0xffffff);
+      }
+    } else if (lvl === 4) {
+      // Dragon's Tower: dark spires and fire
+      for (let i = 0; i < 4; i++) {
+        const sx = 40 + i * 100;
+        this.add.rectangle(sx, GROUND_Y - 80, 18, 120, 0x330022);
+        this.add.triangle(sx, GROUND_Y - 140, sx - 12, GROUND_Y - 80, sx + 12, GROUND_Y - 80, sx, GROUND_Y - 160, 0x550033);
+      }
+    }
+  }
+
   createHUD() {
     const { width } = this.scale;
     this.add.text(16, 16, this.level.name, {
@@ -63,6 +122,9 @@ export class GameScene extends Phaser.Scene {
     this.heartText = this.add.text(width - 16, 16, '❤️❤️❤️', {
       fontSize: '18px',
     }).setOrigin(1, 0);
+    this.scoreText = this.add.text(width / 2, 16, '👑 0', {
+      fontSize: '18px', fill: '#FFD700', stroke: '#000000', strokeThickness: 2,
+    }).setOrigin(0.5, 0);
   }
 
   updateHearts() {
@@ -86,15 +148,39 @@ export class GameScene extends Phaser.Scene {
 
   spawnObstacle(time) {
     const { width } = this.scale;
-    const obs = this.add.rectangle(
-      width + 30, GROUND_Y - 25, 40, 50, this.level.obstacleColor
-    );
-    this.physics.add.existing(obs);
+    const key = this.level.obstacleTexture || 'obstFrog';
+    const obs = this.physics.add.image(width + 40, GROUND_Y - 20, key);
+    obs.setOrigin(0.5, 1);
     obs.body.setVelocityX(-this.level.scrollSpeed);
     obs.body.setAllowGravity(false);
+    obs.body.setImmovable(true);
     this.obstacleGroup.add(obs);
     this.obstacles.push(obs);
     this.nextObstacleTime = time + this.level.obstacleInterval;
+  }
+
+  spawnCrown(time) {
+    const { width } = this.scale;
+    const heights = [GROUND_Y - 80, GROUND_Y - 130, GROUND_Y - 180];
+    const y = heights[Phaser.Math.Between(0, 2)];
+    const crown = this.physics.add.image(width + 20, y, 'crownCollect');
+    crown.body.setVelocityX(-this.level.scrollSpeed);
+    crown.body.setAllowGravity(false);
+    this.physics.add.overlap(this.eila, crown, this.collectCrown, null, this);
+    this.crowns.push(crown);
+    this.nextCrownTime = time + Phaser.Math.Between(800, 1800);
+  }
+
+  collectCrown(eila, crown) {
+    crown.destroy();
+    this.crowns = this.crowns.filter(c => c !== crown);
+    this.score += 10;
+    this.scoreText.setText('👑 ' + this.score);
+    // Pop animation on score text
+    this.tweens.add({
+      targets: this.scoreText, scaleX: 1.4, scaleY: 1.4,
+      duration: 120, yoyo: true,
+    });
   }
 
   hitObstacle(eila, obs) {
@@ -153,6 +239,7 @@ export class GameScene extends Phaser.Scene {
         levelIndex: this.levelIndex,
         stars,
         isLastLevel: this.levelIndex === LEVELS.length - 1,
+        score: this.score,
       });
     });
   }
@@ -192,6 +279,17 @@ export class GameScene extends Phaser.Scene {
     if (time > this.nextObstacleTime) {
       this.spawnObstacle(time);
     }
+
+    // Spawn crowns
+    if (time > this.nextCrownTime && !this.gameOver) {
+      this.spawnCrown(time);
+    }
+
+    // Clean up off-screen crowns
+    this.crowns = this.crowns.filter(c => {
+      if (c.x < -50) { c.destroy(); return false; }
+      return true;
+    });
 
     // Spacebar fallback
     if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {

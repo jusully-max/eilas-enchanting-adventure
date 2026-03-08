@@ -7,6 +7,7 @@ export class WinScene extends Phaser.Scene {
     this.levelIndex = data.levelIndex;
     this.stars = data.stars;
     this.isLastLevel = data.isLastLevel;
+    this.score = data.score || 0;
   }
 
   create() {
@@ -21,6 +22,10 @@ export class WinScene extends Phaser.Scene {
 
     this.add.text(width / 2, 180, level.name, {
       fontSize: '20px', fill: '#ffffff',
+    }).setOrigin(0.5);
+
+    this.add.text(width / 2, 215, '👑 Crowns collected: ' + this.score, {
+      fontSize: '16px', fill: '#FFD700',
     }).setOrigin(0.5);
 
     // Animate stars appearing one by one
