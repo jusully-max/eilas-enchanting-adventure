@@ -43,9 +43,10 @@ export class GameScene extends Phaser.Scene {
     const groundBlock = this.ground.create(width / 2, GROUND_Y + 35, 'groundRect');
     groundBlock.setScale(width / 32, 1).refreshBody();
 
-    // Eila sprite
-    this.eila = this.physics.add.sprite(80, GROUND_Y - 30, 'eilaSprite');
-    this.eila.setCollideWorldBounds(false);
+    // Eila sprite — origin bottom-center so she sits exactly on GROUND_Y
+    this.eila = this.physics.add.sprite(80, GROUND_Y, 'eilaSprite');
+    this.eila.setOrigin(0.5, 1);
+    this.eila.setCollideWorldBounds(true);
 
     this.physics.add.collider(this.eila, this.ground);
 
