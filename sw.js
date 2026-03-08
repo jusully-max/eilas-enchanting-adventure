@@ -1,5 +1,5 @@
 const CACHE = 'eila-v1';
-const ASSETS = [
+const PRECACHE_ASSETS = [
   './',
   './index.html',
   './game.js',
@@ -10,16 +10,21 @@ const ASSETS = [
   './scenes/GameScene.js',
   './scenes/WinScene.js',
   './scenes/VictoryScene.js',
-  'https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js',
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(PRECACHE_ASSETS))
+  );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(self.clients.claim());
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener('fetch', e => {
