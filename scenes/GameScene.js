@@ -152,7 +152,7 @@ export class GameScene extends Phaser.Scene {
       this.scene.start('WinScene', {
         levelIndex: this.levelIndex,
         stars,
-        isLastLevel: this.levelIndex === 4,
+        isLastLevel: this.levelIndex === LEVELS.length - 1,
       });
     });
   }
